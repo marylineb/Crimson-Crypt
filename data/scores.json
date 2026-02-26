@@ -1,0 +1,30 @@
+[
+  {
+    "pseudo": "maryline",
+    "level": 1,
+    "bestScore": 1305,
+    "bestTimeMs": 28766,
+    "updatedAt": "2026-02-26T16:24:45.288Z"
+  },
+  {
+    "pseudo": "maryline",
+    "level": 2,
+    "bestScore": 1428,
+    "bestTimeMs": 34684,
+    "updatedAt": "2026-02-26T16:57:29.959Z"
+  },
+  {
+    "pseudo": "maryline",
+    "level": 3,
+    "bestScore": 2000,
+    "bestTimeMs": 199630,
+    "updatedAt": "2026-02-26T16:40:41.704Z"
+  },
+  {
+    "pseudo": "maryline",
+    "level": 4,
+    "bestScore": 1475,
+    "bestTimeMs": 21061,
+    "updatedAt": "2026-02-26T16:41:22.590Z"
+  }
+]

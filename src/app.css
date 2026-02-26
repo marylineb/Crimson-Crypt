@@ -1,0 +1,451 @@
+/* ═══════════════════════════════════════════════════════════
+   CRIMSON CRYPT — Global Stylesheet
+   Aesthetic: Gothic luxury. Blood-ink on cold stone.
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+  /* Palette de base */
+  --bg:      #080810;
+  --bg2:     #0d0d18;
+  --panel:   #111120;
+  --panel2:  #17172a;
+  --panel3:  #1e1e32;
+  --text:    #eae9f5;
+  --text2:   #c8c7dd;
+  --muted:   #7a7991;
+  --line:    #25253a;
+  --line2:   #2e2e48;
+
+  /* Rouge sang */
+  --red:     #b01222;
+  --red2:    #d11a2a;
+  --red3:    #ff2e46;
+  --red-dim: rgba(177, 18, 34, .18);
+
+  /* Accents */
+  --good:    #3ecf82;
+  --bad:     #ff4461;
+  --gold:    #c9a84c;
+
+  /* Effets */
+  --glow-red:  0 0 22px rgba(209,26,42,.38), 0 0 55px rgba(209,26,42,.12);
+  --glow-soft: 0 0 40px rgba(0,0,0,.6);
+  --shadow:    0 18px 60px rgba(0,0,0,.55), 0 4px 14px rgba(0,0,0,.35);
+
+  /* Typographie */
+  --font-display: 'Cinzel', 'Palatino Linotype', Georgia, serif;
+  --font-body:    'Crimson Pro', 'Palatino Linotype', Georgia, serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Géométrie */
+  --radius-sm:  8px;
+  --radius:    14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ── Body & fond atmosphérique ─────────────────────────── */
+body {
+  min-height: 100%;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text);
+  background-color: var(--bg);
+
+  /* Fond en couches : halos rouges + texture de pierre */
+  background-image:
+    radial-gradient(ellipse 1000px 600px at 15% -5%,  rgba(177,18,34,.20), transparent 55%),
+    radial-gradient(ellipse  700px 400px at 90%  5%,  rgba(209,26,42,.14), transparent 50%),
+    radial-gradient(ellipse 1400px 700px at 50% 110%, rgba(255,255,255,.04), transparent 55%),
+    radial-gradient(ellipse  600px 600px at 50%  50%, rgba(20,18,36,.8), transparent 80%);
+
+  /* Grain subtil façon parchemin ancien */
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* Grain overlay CSS pur */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: .028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px;
+}
+
+/* ── Brouillard animé ──────────────────────────────────── */
+@keyframes fogDrift {
+  0%   { transform: translateX(-8%) translateY(0)    scale(1);    opacity: .18; }
+  33%  { transform: translateX( 5%) translateY(-3%)  scale(1.02); opacity: .28; }
+  66%  { transform: translateX(-3%) translateY( 2%)  scale(.98);  opacity: .22; }
+  100% { transform: translateX(-8%) translateY(0)    scale(1);    opacity: .18; }
+}
+
+.fog {
+  position: fixed;
+  inset: -25%;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(500px 280px at 18% 30%, rgba(240,230,255,.06), transparent 65%),
+    radial-gradient(620px 300px at 70% 45%, rgba(255,255,255,.04), transparent 65%),
+    radial-gradient(440px 280px at 42% 75%, rgba(200,210,255,.04), transparent 65%);
+  filter: blur(22px);
+  animation: fogDrift 14s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+/* ── Layout ────────────────────────────────────────────── */
+.container {
+  position: relative;
+  z-index: 2;
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+@media (max-width: 600px) {
+  .container { padding: 16px 14px; }
+}
+
+/* ── Typographie ───────────────────────────────────────── */
+.h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1.15;
+  color: var(--text);
+
+  /* Glow rouge très subtil sur les titres */
+  text-shadow: 0 0 40px rgba(209,26,42,.25), 0 2px 6px rgba(0,0,0,.5);
+}
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 3vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--text2);
+}
+
+.p {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ── Card ──────────────────────────────────────────────── */
+.card {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.035) 0%, transparent 40%),
+    var(--panel);
+  border: 1px solid var(--line2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+
+  /* Fine ligne lumineuse en haut à gauche */
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), rgba(209,26,42,.12), transparent);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.card-inner {
+  padding: clamp(14px, 3vw, 22px);
+}
+
+/* Card enfant (panneau imbriqué) */
+.card .card {
+  background: linear-gradient(160deg, rgba(255,255,255,.025) 0%, transparent 40%), var(--panel2);
+  border-color: var(--line);
+  box-shadow: 0 6px 24px rgba(0,0,0,.3);
+}
+
+/* ── Layout helpers ────────────────────────────────────── */
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.grid    { display: grid; gap: 14px; }
+.grid-2  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3  { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 720px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+  .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* ── Badge ─────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--line2);
+  color: var(--muted);
+  font-size: .78rem;
+  font-family: var(--font-display);
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.badge b {
+  color: var(--text2);
+  font-weight: 600;
+}
+
+/* Variante rouge */
+.badge.badge-red {
+  background: rgba(177,18,34,.12);
+  border-color: rgba(209,26,42,.3);
+  color: var(--red3);
+}
+
+/* ── Boutons ───────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 11px 20px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(209,26,42,.4);
+  background:
+    linear-gradient(160deg, rgba(255,46,70,.16), rgba(177,18,34,.07));
+  color: var(--text);
+  box-shadow: var(--glow-red);
+  transition:
+    filter      .12s ease,
+    border-color .18s ease,
+    box-shadow   .18s ease,
+    transform    .08s ease;
+
+  /* Pulsation rouge permanente — subtile */
+  animation: btnPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes btnPulse {
+  0%,100% { box-shadow: 0 0 14px rgba(209,26,42,.22), 0 0 40px rgba(209,26,42,.06); }
+  50%     { box-shadow: 0 0 24px rgba(255,46,70,.38), 0 0 55px rgba(209,26,42,.12); }
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.14);
+  border-color: rgba(255,46,70,.65);
+  box-shadow: 0 0 30px rgba(255,46,70,.5), 0 0 70px rgba(209,26,42,.18);
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(.98);
+  animation: none;
+}
+
+/* Secondaire : sobre, sans glow */
+.btn.secondary {
+  border-color: var(--line2);
+  background: rgba(255,255,255,.045);
+  box-shadow: none;
+  animation: none;
+}
+
+.btn.secondary:hover:not(:disabled) {
+  border-color: var(--line2);
+  background: rgba(255,255,255,.07);
+  box-shadow: none;
+  filter: none;
+  transform: translateY(-1px);
+}
+
+/* Danger */
+.btn.danger {
+  border-color: rgba(255,68,97,.45);
+  background: rgba(255,68,97,.12);
+  color: var(--bad);
+  animation: none;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: .38;
+  filter: none;
+  box-shadow: none;
+  animation: none;
+  transform: none;
+}
+
+/* ── Input ─────────────────────────────────────────────── */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line2);
+  background: rgba(0,0,0,.3);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease;
+  caret-color: var(--red3);
+}
+
+.input::placeholder {
+  color: var(--muted);
+  opacity: .7;
+}
+
+.input:focus {
+  border-color: rgba(255,46,70,.5);
+  box-shadow: 0 0 0 3px rgba(209,26,42,.12), var(--glow-red);
+}
+
+/* ── HR ────────────────────────────────────────────────── */
+.hr {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line2) 30%, var(--line2) 70%, transparent);
+  margin: 16px 0;
+  border: none;
+}
+
+/* ── Toast / Result panel ──────────────────────────────── */
+.toast {
+  border: 1px solid rgba(209,26,42,.3);
+  background:
+    linear-gradient(135deg, rgba(177,18,34,.1), rgba(0,0,0,.2)),
+    rgba(177,18,34,.06);
+  backdrop-filter: blur(6px);
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  color: var(--text);
+  box-shadow: 0 0 30px rgba(209,26,42,.1);
+}
+
+/* ── KBD ───────────────────────────────────────────────── */
+.kbd {
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  padding: 3px 8px;
+  border-radius: 7px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--line2);
+  border-bottom-width: 2px;
+  color: var(--text2);
+  letter-spacing: .04em;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar               { width: 6px; height: 6px; }
+::-webkit-scrollbar-track         { background: var(--bg); }
+::-webkit-scrollbar-thumb         { background: var(--line2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover   { background: rgba(209,26,42,.4); }
+
+/* ── Sélection de texte ────────────────────────────────── */
+::selection {
+  background: rgba(209,26,42,.35);
+  color: var(--text);
+}
+
+/* ── Focus visible accessible ──────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgba(255,46,70,.6);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ── Animations utilitaires ────────────────────────────── */
+
+/* Apparition douce pour n'importe quel élément */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp .45s ease both;
+}
+
+/* Pulsation glow rouge — utilisable via classe */
+@keyframes glowPulse {
+  0%,100% { box-shadow: 0 0 10px rgba(209,26,42,.2); }
+  50%     { box-shadow: 0 0 26px rgba(255,46,70,.45); }
+}
+
+.glow-pulse {
+  animation: glowPulse 2.2s ease-in-out infinite;
+}
+
+/* ── Responsive fondamentaux ───────────────────────────── */
+
+/* Texte plus petit sur mobile */
+@media (max-width: 480px) {
+  body      { font-size: 15.5px; }
+  .h1       { font-size: 1.65rem; }
+  .h2       { font-size: 1rem; }
+  .btn      { padding: 10px 16px; font-size: .78rem; }
+  .card-inner { padding: 14px; }
+  .badge    { font-size: .72rem; padding: 4px 9px; }
+}
+
+/* Très petits écrans */
+@media (max-width: 360px) {
+  body      { font-size: 14.5px; }
+  .container{ padding: 10px; }
+}
+
+/* ── Print ─────────────────────────────────────────────── */
+@media print {
+  .fog, body::before { display: none; }
+  body { background: white; color: black; }
+}
