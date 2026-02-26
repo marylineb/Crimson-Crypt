@@ -22,6 +22,7 @@
     <nav class="row" style="gap:8px;">
       <a class="btn secondary" href="/dashboard">Dashboard</a>
       <a class="btn secondary" href="/leaderboard">Leaderboard</a>
+	  <a class="btn secondary" href="/comments">Commentaires</a>
       {#if data?.user?.pseudo}
         <button class="btn" on:click={logout}>Logout</button>
       {/if}
