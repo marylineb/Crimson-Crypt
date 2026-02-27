@@ -10,5 +10,19 @@
     ],
     "createdAt": "2026-02-26T15:29:14.913Z",
     "updatedAt": "2026-02-26T17:01:07.321Z"
+  },
+  {
+    "pseudo": "mary",
+    "unlockedLevel": 1,
+    "completed": [],
+    "createdAt": "2026-02-27T00:42:09.511Z",
+    "updatedAt": "2026-02-27T00:42:09.511Z"
+  },
+  {
+    "pseudo": "love",
+    "unlockedLevel": 1,
+    "completed": [],
+    "createdAt": "2026-02-27T00:50:54.041Z",
+    "updatedAt": "2026-02-27T00:50:54.041Z"
   }
 ]

@@ -2,10 +2,10 @@
   import "../app.css";
   export let data: any;
 
-  async function logout(){
-    await fetch("/api/auth/logout", { method: "POST" });
-    location.href = "/";
-  }
+ async function logout(){
+  await fetch("/api/auth/logout", { method: "POST" });
+  window.location.assign("/");
+}
 </script>
 
 <div class="fog"></div>

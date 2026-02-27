@@ -9,5 +9,5 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
   const isProtected = PROTECTED_PREFIXES.some((p) => url.pathname.startsWith(p));
   if (isProtected && !pseudo) throw redirect(303, "/");
 
-  return { user: pseudo ? { pseudo } : null };
+  return { user: { pseudo } };
 };

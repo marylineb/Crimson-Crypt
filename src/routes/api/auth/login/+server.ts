@@ -1,27 +1,25 @@
 import type { RequestHandler } from "./$types";
 import { json } from "@sveltejs/kit";
-import { getOrCreateUser } from "$lib/server/db";
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, url }) => {
   const body = await request.json().catch(() => ({}));
-  const pseudo = String(body?.pseudo ?? "").trim();
+  const pseudoRaw = String(body?.pseudo ?? "");
+  const pseudo = pseudoRaw.trim().replace(/\s+/g, " ").slice(0, 24);
 
-  if (!pseudo || pseudo.length < 2) {
+  if (pseudo.length < 2) {
     return json({ ok: false, message: "Pseudo trop court." }, { status: 400 });
   }
-  if (pseudo.length > 18) {
-    return json({ ok: false, message: "Pseudo trop long (max 18)." }, { status: 400 });
-  }
 
-  await getOrCreateUser(pseudo);
+  // HTTPS en prod (vercel), HTTP en local
+  const secure = url.protocol === "https:";
 
   cookies.set("cc_pseudo", pseudo, {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
-    secure: false, // true en prod https
-    maxAge: 60 * 60 * 24 * 14
+    secure,
+    maxAge: 60 * 60 * 24 * 30
   });
 
-  return json({ ok: true });
+  return json({ ok: true, pseudo });
 };

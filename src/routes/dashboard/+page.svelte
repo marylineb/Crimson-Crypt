@@ -2,12 +2,15 @@
   import { onMount } from "svelte";
   import { getRank, rankBadge } from "$lib/rank";
 
+  export let data: { pseudo: string };
+
   type Progress = { unlockedLevel: number; completed: number[] };
   type Row = { pseudo: string; total: number; bestByLevel: Record<number, number> };
 
-  let progress: Progress | null = null;
+  let progress: Progress = { unlockedLevel: 1, completed: [] };
   let myTotal = 0;
   let loading = true;
+  let error = "";
 
   const levels = [
     { id: 1, title: "🧠 Quiz du Sang", desc: "10 questions. Réponds vite." },
@@ -16,45 +19,33 @@
     { id: 4, title: "🎮 Boss: Crimson Trial", desc: "Mix rapide: 3 micro-épreuves." }
   ];
 
+  const isUnlocked = (id: number) => id <= (progress?.unlockedLevel ?? 1);
+  const isDone = (id: number) => (progress?.completed ?? []).includes(id);
+
   onMount(async () => {
-    const [pRes, sRes] = await Promise.all([fetch("/api/progress"), fetch("/api/scores")]);
-    const pData = await pRes.json();
-    const sData = await sRes.json();
+    loading = true;
+    error = "";
 
-    progress = pData?.progress ?? { unlockedLevel: 1, completed: [] };
+    try {
+      // on stocke le pseudo proprement (plus besoin d'hack DOM/localStorage)
+      localStorage.setItem("cc_last_pseudo", data.pseudo);
 
-    // retrouve mon total via cookie côté serveur => pseudo affiché dans navbar
-    // côté client: on prend le meilleur: si absent, total=0
-    const me = (window?.document?.cookie ?? "");
-    // pas de parsing cookie ici; on prend "ta ligne" en supposant pseudo présent côté serveur et reflété dans leaderboard
-    // => on prend la 1ère ligne correspondant à ton pseudo via localStorage fallback
-    const lastPseudo = localStorage.getItem("cc_last_pseudo") ?? "";
+      const [pRes, sRes] = await Promise.all([fetch("/api/progress"), fetch("/api/scores")]);
 
-    const rows: Row[] = sData?.leaderboard ?? [];
-    const mine = rows.find(r => r.pseudo.toLowerCase() === lastPseudo.toLowerCase());
-    myTotal = mine?.total ?? 0;
+      const pData = await pRes.json().catch(() => ({}));
+      const sData = await sRes.json().catch(() => ({}));
 
-    loading = false;
-  });
+      progress = pData?.progress ?? { unlockedLevel: 1, completed: [] };
 
-  // on stocke le pseudo depuis la navbar via une astuce: on le récupère sur le DOM
-  // plus simple: au premier accès dashboard, on lit le badge "👤 pseudo"
-  // et on le met en localStorage.
-  $: {
-    const el = document?.querySelector?.("header .badge:nth-child(2)");
-    const txt = el?.textContent ?? "";
-    if (txt.includes("👤")) {
-      const pseudo = txt.replace("👤","").trim();
-      if (pseudo) localStorage.setItem("cc_last_pseudo", pseudo);
+      const rows: Row[] = sData?.leaderboard ?? [];
+      const mine = rows.find((r) => r.pseudo.toLowerCase() === data.pseudo.toLowerCase());
+      myTotal = mine?.total ?? 0;
+    } catch (e) {
+      error = "Impossible de charger ta progression. Réessaie.";
+    } finally {
+      loading = false;
     }
-  }
-
-  function isUnlocked(level: number){
-    return (progress?.unlockedLevel ?? 1) >= level;
-  }
-  function isDone(level: number){
-    return (progress?.completed ?? []).includes(level);
-  }
+  });
 </script>
 
 <div class="card">
@@ -64,10 +55,13 @@
 
     {#if loading}
       <div class="toast">Chargement de ta progression…</div>
+    {:else if error}
+      <div class="toast">{error}</div>
     {:else}
       <div class="row" style="margin-bottom:10px;">
-        <span class="badge">🔓 Débloqué jusqu’au niveau <b>{progress?.unlockedLevel}</b></span>
-        <span class="badge">✅ Terminés: <b>{progress?.completed?.length ?? 0}</b>/4</span>
+        <span class="badge">👤 <b>{data.pseudo}</b></span>
+        <span class="badge">🔓 Débloqué jusqu’au niveau <b>{progress.unlockedLevel}</b></span>
+        <span class="badge">✅ Terminés: <b>{progress.completed.length}</b>/4</span>
         <span class="badge">🏅 Rang: <b>{rankBadge(getRank(myTotal))}</b></span>
         <span class="badge">🧮 Total: <b>{myTotal}</b></span>
       </div>
@@ -80,8 +74,12 @@
                 <div>
                   <div class="h2" style="margin-bottom:6px;">
                     {lv.title}
-                    {#if isDone(lv.id)} <span class="badge" style="margin-left:8px;">✔ terminé</span>{/if}
-                    {#if !isUnlocked(lv.id)} <span class="badge" style="margin-left:8px;">🔒 verrouillé</span>{/if}
+                    {#if isDone(lv.id)}
+                      <span class="badge" style="margin-left:8px;">✔ terminé</span>
+                    {/if}
+                    {#if !isUnlocked(lv.id)}
+                      <span class="badge" style="margin-left:8px;">🔒 verrouillé</span>
+                    {/if}
                   </div>
                   <p class="p">{lv.desc}</p>
                 </div>
