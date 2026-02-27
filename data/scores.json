@@ -26,5 +26,33 @@
     "bestScore": 1475,
     "bestTimeMs": 21061,
     "updatedAt": "2026-02-26T16:41:22.590Z"
+  },
+  {
+    "pseudo": "love",
+    "level": 1,
+    "bestScore": 1729,
+    "bestTimeMs": 13571,
+    "updatedAt": "2026-02-27T01:27:50.784Z"
+  },
+  {
+    "pseudo": "bil",
+    "level": 1,
+    "bestScore": 1708,
+    "bestTimeMs": 14605,
+    "updatedAt": "2026-02-27T01:40:23.160Z"
+  },
+  {
+    "pseudo": "bil",
+    "level": 2,
+    "bestScore": 1526,
+    "bestTimeMs": 28939,
+    "updatedAt": "2026-02-27T01:40:56.943Z"
+  },
+  {
+    "pseudo": "bil",
+    "level": 3,
+    "bestScore": 2440,
+    "bestTimeMs": 75735,
+    "updatedAt": "2026-02-27T01:42:17.213Z"
   }
 ]

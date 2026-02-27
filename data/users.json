@@ -24,5 +24,16 @@
     "completed": [],
     "createdAt": "2026-02-27T00:50:54.041Z",
     "updatedAt": "2026-02-27T00:50:54.041Z"
+  },
+  {
+    "pseudo": "bil",
+    "unlockedLevel": 4,
+    "completed": [
+      1,
+      2,
+      3
+    ],
+    "createdAt": "2026-02-27T01:31:05.482Z",
+    "updatedAt": "2026-02-27T01:42:17.224Z"
   }
 ]
