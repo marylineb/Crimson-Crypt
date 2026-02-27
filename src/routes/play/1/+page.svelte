@@ -23,17 +23,62 @@
 
   // ─── Questions ───────────────────────────────────────────────────────────────
   const questions: Q[] = [
-    { q: "Quel est le contraire de « aube » ?",          a: ["Midi","Crépuscule","Aurore","Zénith"],          ok: 1 },
-    { q: "2⁵ = ?",                                       a: ["16","24","32","64"],                           ok: 2 },
-    { q: "En HTML, la balise de lien hypertexte ?",      a: ["<img>","<a>","<p>","<link>"],                  ok: 1 },
-    { q: "Quel mot est un palindrome ?",                 a: ["vampire","kayak","dragon","tomate"],           ok: 1 },
-    { q: "CSS : propriété pour arrondir un bloc ?",      a: ["shadow","radius","border-radius","curve"],     ok: 2 },
-    { q: "Somme des angles d'un triangle ?",             a: ["90°","180°","270°","360°"],                    ok: 1 },
-    { q: "JS : méthode pour convertir en nombre ?",      a: ["Number()","String()","Bool()","ParseCSS()"],   ok: 0 },
-    { q: "Quel langage est typé statiquement ?",         a: ["TypeScript","HTML","CSS","Markdown"],          ok: 0 },
-    { q: "SvelteKit : dossier des routes ?",             a: ["src/pages","src/routes","src/app","routes/"],  ok: 1 },
-    { q: "Qu'est-ce qui exécute le code côté client ?",  a: ["Serveur","Navigateur","Base de données","CDN"],ok: 1 },
-  ];
+  {
+    q: "Quel langage est exécuté directement par le navigateur ?",
+    a: ["Python", "JavaScript", "PHP", "C++"],
+    ok: 1
+  },
+  {
+    q: "Que signifie CSS ?",
+    a: [
+      "Computer Style Sheets",
+      "Creative Style System",
+      "Cascading Style Sheets",
+      "Color Style Syntax"
+    ],
+    ok: 2
+  },
+  {
+    q: "Quelle méthode JavaScript affiche un message dans la console ?",
+    a: ["console.log()", "print()", "echo()", "debug()"],
+    ok: 0
+  },
+  {
+    q: "Quel symbole démarre un commentaire en JavaScript (ligne unique) ?",
+    a: ["<!--", "//", "#", "**"],
+    ok: 1
+  },
+  {
+    q: "Quel dossier contient les routes dans SvelteKit ?",
+    a: ["src/pages", "src/routes", "routes/app", "app/routes"],
+    ok: 1
+  },
+  {
+    q: "Quelle balise HTML sert à afficher une image ?",
+    a: ["<image>", "<img>", "<pic>", "<src>"],
+    ok: 1
+  },
+  {
+    q: "Que retourne `typeof 42` en JavaScript ?",
+    a: ["integer", "number", "float", "numeric"],
+    ok: 1
+  },
+  {
+    q: "Quel protocole sécurisé est utilisé pour les sites web ?",
+    a: ["FTP", "HTTP", "HTTPS", "SSH"],
+    ok: 2
+  },
+  {
+    q: "Dans Git, quelle commande envoie les commits vers le dépôt distant ?",
+    a: ["git send", "git upload", "git push", "git publish"],
+    ok: 2
+  },
+  {
+    q: "Quel outil permet d’animer facilement des éléments JS dans ton projet ?",
+    a: ["React Motion", "GSAP", "jQuery UI", "ThreeCSS"],
+    ok: 1
+  }
+];
 
   // ─── État ────────────────────────────────────────────────────────────────────
   let i         = 0;
