@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy, tick } from "svelte";
   import { gsap } from "gsap";
   import { nowMs, postScore, unlockLevel } from "$lib/game";
   import { vampEnter } from "$lib/anim";
@@ -29,10 +29,10 @@
     { q: "Quel mot est un palindrome ?",                 a: ["vampire","kayak","dragon","tomate"],           ok: 1 },
     { q: "CSS : propriété pour arrondir un bloc ?",      a: ["shadow","radius","border-radius","curve"],     ok: 2 },
     { q: "Somme des angles d'un triangle ?",             a: ["90°","180°","270°","360°"],                    ok: 1 },
-    { q: "JS : méthode pour convertir en nombre ?",     a: ["Number()","String()","Bool()","ParseCSS()"],    ok: 0 },
+    { q: "JS : méthode pour convertir en nombre ?",      a: ["Number()","String()","Bool()","ParseCSS()"],   ok: 0 },
     { q: "Quel langage est typé statiquement ?",         a: ["TypeScript","HTML","CSS","Markdown"],          ok: 0 },
     { q: "SvelteKit : dossier des routes ?",             a: ["src/pages","src/routes","src/app","routes/"],  ok: 1 },
-    { q: "Qu'est-ce qui exécute le code côté client ?", a: ["Serveur","Navigateur","Base de données","CDN"],ok: 1 },
+    { q: "Qu'est-ce qui exécute le code côté client ?",  a: ["Serveur","Navigateur","Base de données","CDN"],ok: 1 },
   ];
 
   // ─── État ────────────────────────────────────────────────────────────────────
@@ -47,9 +47,12 @@
   let startMs   = 0;
   let timerInterval: ReturnType<typeof setInterval> | null = null;
 
-  $: timeLeft   = Math.max(0, TIME_LIMIT - elapsed);
-  $: timerPct   = timeLeft / TIME_LIMIT;
-  $: timerColor = timerPct > 0.5 ? "#8b0000" : timerPct > 0.25 ? "#c0392b" : "#ff1744";
+  // ✅ verrou anti spam / double finish
+  let finishing = false;
+
+  $: timeLeft    = Math.max(0, TIME_LIMIT - elapsed);
+  $: timerPct    = timeLeft / TIME_LIMIT;
+  $: timerColor  = timerPct > 0.5 ? "#8b0000" : timerPct > 0.25 ? "#c0392b" : "#ff1744";
   $: progressPct = (i / TOTAL_Q) * 100;
 
   function fmt(s: number) {
@@ -67,42 +70,36 @@
   }
 
   function stopTimer() {
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
   }
 
   // ─── Animations GSAP ─────────────────────────────────────────────────────────
-
-  /** Entrée de la nouvelle question */
   function animateQuestionIn() {
     if (!questionEl) return;
-    gsap.fromTo(questionEl,
-      { opacity: 0, x: 18 },
-      { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }
-    );
+    gsap.fromTo(questionEl, { opacity: 0, x: 18 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" });
+
     const btns = answerEls.filter(Boolean) as HTMLButtonElement[];
-    gsap.fromTo(btns,
+    gsap.fromTo(
+      btns,
       { opacity: 0, y: 12, scale: 0.96 },
       { opacity: 1, y: 0, scale: 1, duration: 0.28, ease: "back.out(1.4)", stagger: 0.06, delay: 0.1 }
     );
   }
 
-  /** Pulse du score */
   function animateScore() {
     if (!scoreEl) return;
-    gsap.fromTo(scoreEl,
-      { scale: 1 },
-      { scale: 1.22, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.out" }
-    );
+    gsap.fromTo(scoreEl, { scale: 1 }, { scale: 1.22, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.out" });
   }
 
-  /** Flash vert sur bonne réponse */
   function animateCorrect(btn: HTMLButtonElement) {
     gsap.timeline()
       .to(btn, { scale: 1.06, boxShadow: "0 0 22px 4px rgba(66,211,146,.55)", duration: 0.18, ease: "power2.out" })
       .to(btn, { scale: 1.0,  boxShadow: "0 0 0px rgba(0,0,0,0)",             duration: 0.22, ease: "power2.in" });
   }
 
-  /** Shake + flash rouge sur mauvaise réponse */
   function animateWrong(btn: HTMLButtonElement) {
     gsap.timeline()
       .to(btn, { x: -10, boxShadow: "0 0 18px 3px rgba(255,23,68,.5)", duration: 0.07 })
@@ -112,30 +109,16 @@
       .to(btn, { x:   0, boxShadow: "0 0 0px rgba(0,0,0,0)", duration: 0.1 });
   }
 
-  /** Highlight de la bonne réponse après un mauvais choix */
   function animateReveal(btn: HTMLButtonElement) {
-    gsap.to(btn, {
-      boxShadow: "0 0 16px 3px rgba(66,211,146,.4)",
-      duration: 0.25,
-      repeat: 2,
-      yoyo: true,
-      ease: "power1.inOut"
-    });
+    gsap.to(btn, { boxShadow: "0 0 16px 3px rgba(66,211,146,.4)", duration: 0.25, repeat: 2, yoyo: true, ease: "power1.inOut" });
   }
 
-  /** Victoire : flash global + panel */
   function animateVictory() {
-    gsap.fromTo(rootEl,
-      { filter: "brightness(1)" },
-      { filter: "brightness(1.18)", duration: 0.2, yoyo: true, repeat: 1 }
-    );
+    gsap.fromTo(rootEl, { filter: "brightness(1)" }, { filter: "brightness(1.18)", duration: 0.2, yoyo: true, repeat: 1 });
     const panel = rootEl.querySelector<HTMLElement>("[data-result]");
-    if (panel) {
-      gsap.from(panel, { y: 50, opacity: 0, scale: 0.92, duration: 0.55, delay: 0.15, ease: "back.out(1.6)" });
-    }
+    if (panel) gsap.from(panel, { y: 50, opacity: 0, scale: 0.92, duration: 0.55, delay: 0.15, ease: "back.out(1.6)" });
   }
 
-  /** Défaite : tremblement global */
   function animateDefeat() {
     gsap.timeline()
       .to(rootEl, { x: -12, duration: 0.07 })
@@ -143,31 +126,30 @@
       .to(rootEl, { x:  -8, duration: 0.06 })
       .to(rootEl, { x:   8, duration: 0.06 })
       .to(rootEl, { x:   0, duration: 0.1  });
+
     const panel = rootEl.querySelector<HTMLElement>("[data-result]");
-    if (panel) {
-      gsap.from(panel, { y: 30, opacity: 0, duration: 0.45, delay: 0.3, ease: "power2.out" });
-    }
+    if (panel) gsap.from(panel, { y: 30, opacity: 0, duration: 0.45, delay: 0.3, ease: "power2.out" });
   }
 
   // ─── Logique de jeu ──────────────────────────────────────────────────────────
   function pick(idx: number, btn: HTMLButtonElement) {
-    if (phase !== "playing" || picked !== null) return;
+    if (phase !== "playing" || picked !== null || finishing) return;
 
-    sfx.click();
+    // ✅ verrou tout de suite
     picked = idx;
 
+    sfx.click();
     const good = idx === questions[i].ok;
 
     if (good) {
       score  += PTS_PER_Q;
-      correct++;
+      correct = Math.min(TOTAL_Q, correct + 1); // ✅ jamais au-dessus
       animateCorrect(btn);
       animateScore();
       sfx.win?.();
     } else {
       animateWrong(btn);
       sfx.lose?.();
-      // révéler la bonne réponse
       const goodBtn = answerEls[questions[i].ok];
       if (goodBtn) setTimeout(() => animateReveal(goodBtn), 120);
     }
@@ -184,6 +166,9 @@
   }
 
   async function finish() {
+    if (finishing) return;       // ✅ anti double finish
+    finishing = true;
+
     stopTimer();
     if (phase !== "playing") return;
 
@@ -194,17 +179,29 @@
     finalTotal = total;
     finalBonus = bonus;
 
-    await postScore(1, total, timeMs);
+    const won = correct >= 6;
 
-    if (correct >= 6) {
-      await unlockLevel(1);
+    // ✅ bascule UI immédiatement (même si l’API échoue)
+    phase = won ? "win" : "lose";
+
+    // ✅ enregistrement score (ne casse pas l'écran si ça fail)
+    try {
+      await postScore(1, total, timeMs);
+    } catch (e) {
+      console.error("postScore failed", e);
+    }
+
+    if (won) {
+      try {
+        await unlockLevel(1);
+      } catch (e) {
+        console.error("unlockLevel failed", e);
+      }
       sfx.win?.();
-      phase = "win";
       await tick();
       animateVictory();
     } else {
       sfx.lose?.();
-      phase = "lose";
       await tick();
       animateDefeat();
     }
@@ -212,25 +209,22 @@
 
   function reset() {
     stopTimer();
-    i       = 0;
-    score   = 0;
-    correct = 0;
-    picked  = null;
-    phase   = "playing";
-    elapsed = 0;
+    i         = 0;
+    score     = 0;
+    correct   = 0;
+    picked    = null;
+    phase     = "playing";
+    elapsed   = 0;
     finalTotal = 0;
     finalBonus = 0;
     answerEls  = [];
+    finishing  = false;
 
     setTimeout(() => {
       gsap.fromTo(rootEl, { opacity: 0.85, y: 8 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" });
       startTimer();
       animateQuestionIn();
     }, 40);
-  }
-
-  function tick(): Promise<void> {
-    return new Promise(r => setTimeout(r, 30));
   }
 
   // ─── Lifecycle ───────────────────────────────────────────────────────────────
@@ -354,7 +348,7 @@
         </div>
         <div class="rscore">
           <span class="rscore-label">Correctes</span>
-          <span class="rscore-val" class:rscore-pass={correct >= 6}>{correct}/{TOTAL_Q}</span>
+          <span class="rscore-val" class:rscore-pass={correct >= 6}>{Math.min(correct, TOTAL_Q)}/{TOTAL_Q}</span>
         </div>
         <div class="rscore">
           <span class="rscore-label">Temps</span>

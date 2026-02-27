@@ -35,5 +35,14 @@
     ],
     "createdAt": "2026-02-27T01:31:05.482Z",
     "updatedAt": "2026-02-27T01:42:17.224Z"
+  },
+  {
+    "pseudo": "sil",
+    "unlockedLevel": 2,
+    "completed": [
+      1
+    ],
+    "createdAt": "2026-02-27T01:47:03.464Z",
+    "updatedAt": "2026-02-27T02:00:09.802Z"
   }
 ]
