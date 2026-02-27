@@ -1,9 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
-import { env } from "$env/dynamic/private";
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "$env/static/private";
 
-const url = env.SUPABASE_URL;
-const key = env.SUPABASE_ANON_KEY;
+export const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: false }
+});
 
-if (!url || !key) throw new Error("Missing env");
-
-export const supabaseServer = createClient(url, key);
+export const supabaseServer = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: false }
+});
