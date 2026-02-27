@@ -121,3 +121,46 @@ export async function upsertBestScore(entry: { pseudo: string; level: number; sc
   if (updErr) throw updErr;
 }
 
+export async function getLeaderboard(): Promise<
+  Array<{ pseudo: string; total: number; bestByLevel: Record<number, number> }>
+> {
+  const { data, error } = await supabaseAdmin
+    .from("best_scores")
+    .select("*");
+
+  if (error) throw error;
+
+  const map = new Map<
+    string,
+    { pseudo: string; bestByLevel: Record<number, number> }
+  >();
+
+  for (const s of data ?? []) {
+    const key = s.pseudo.toLowerCase();
+
+    if (!map.has(key)) {
+      map.set(key, { pseudo: s.pseudo, bestByLevel: {} });
+    }
+
+    const obj = map.get(key)!;
+
+    obj.bestByLevel[s.level] = Math.max(
+      obj.bestByLevel[s.level] ?? 0,
+      s.best_score
+    );
+  }
+
+  const list = [...map.values()].map((x) => ({
+    pseudo: x.pseudo,
+    bestByLevel: x.bestByLevel,
+    total:
+      (x.bestByLevel[1] ?? 0) +
+      (x.bestByLevel[2] ?? 0) +
+      (x.bestByLevel[3] ?? 0) +
+      (x.bestByLevel[4] ?? 0)
+  }));
+
+  list.sort((a, b) => b.total - a.total);
+
+  return list;
+}
