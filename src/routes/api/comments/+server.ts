@@ -12,7 +12,10 @@ export const GET: RequestHandler = async ({ url }) => {
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  if (error) return json({ ok: false, message: error.message }, { status: 500 });
+  if (error) {
+    console.error("[comments:GET]", error);
+    return json({ ok: false, message: "Impossible de charger les commentaires." }, { status: 500 });
+  }
 
   return json({ ok: true, comments: data ?? [] });
 };
@@ -34,7 +37,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     .select("id,pseudo,message,created_at")
     .single();
 
-  if (error) return json({ ok: false, message: error.message }, { status: 500 });
+  if (error) {
+    console.error("[comments:POST]", error);
+    return json({ ok: false, message: "Impossible d'enregistrer le commentaire." }, { status: 500 });
+  }
 
   return json({ ok: true, comment: data });
 };

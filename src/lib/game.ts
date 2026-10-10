@@ -16,8 +16,6 @@ export async function postScore(level: number, score: number, timeMs: number) {
 }
 
 export async function unlockLevel(level: number) {
-  console.log("✅ unlockLevel NEW VERSION", level);
-
   const r = await fetch("/api/progress", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
